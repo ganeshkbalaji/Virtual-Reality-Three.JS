@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Cardboard Example</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+      body {
+        margin: 0px;
+        overflow: hidden;
+      }
+      #example {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="example"></div>
+
+  <script src="three.js"></script>
+  <script src="StereoEffect.js"></script>
+  <script src="DeviceOrientationControls.js"></script>
+  <script src="OrbitControls.js"></script>
+
+  <script>
+    var camera, scene, renderer;
+    var effect, controls;
+    var element, container;
+
+    var clock = new THREE.Clock();
+
+    init();
+    animate();
+
+    function init() {
+      renderer = new THREE.WebGLRenderer();
+      element = renderer.domElement;
+      container = document.getElementById('example');
+      container.appendChild(element);
+
+      effect = new THREE.StereoEffect(renderer);
+
+      scene = new THREE.Scene();
+
+      camera = new THREE.PerspectiveCamera(90, 1, 0.001, 700);
+      camera.position.set(0, 10, 0);
+      scene.add(camera);
+
+      controls = new THREE.OrbitControls(camera, element);
+      controls.rotateUp(Math.PI / 4);
+      controls.target.set(
+        camera.position.x + 0.1,
+        camera.position.y,
+        camera.position.z
+      );
+      controls.noZoom = true;
+      controls.noPan = true;
+
+      function setOrientationControls(e) {
+        if (!e.alpha) {
+          return;
+        }
+
+        controls = new THREE.DeviceOrientationControls(camera, true);
+        controls.connect();
+        controls.update();
+
+        element.addEventListener('click', fullscreen, false);
+
+        window.removeEventListener('deviceorientation', setOrientationControls, true);
+      }
+      window.addEventListener('deviceorientation', setOrientationControls, true);
+
+
+      var light = new THREE.HemisphereLight(0x777777, 0x000000, 0.3);
+      scene.add(light);
+
+      var ambiLight = new THREE.AmbientLight( 0x404040 ); // soft white light
+      scene.add( ambiLight );
+
+      // var plight = new THREE.PointLight( 0x777777, 2, 100 );
+      // plight.position.set( -20, 5, 0 );
+      // scene.add( plight );
+
+      var directionalLight1 = new THREE.DirectionalLight( 0xffffff, 0.2 );
+      directionalLight1.position.set( -2.9, 0.9, 2.9 );
+      scene.add( directionalLight1 );
+      var directionalLight2 = new THREE.DirectionalLight( 0xffffff, 0.2 );
+      directionalLight2.position.set( 2.9, 0.9, -2.9 );
+      scene.add( directionalLight2 );
+      var directionalLight3 = new THREE.DirectionalLight( 0xffffff, 0.2 );
+      directionalLight3.position.set( 2.9, 0.9, 2.9 );
+      scene.add( directionalLight3 );
+      var directionalLight4 = new THREE.DirectionalLight( 0xffffff, 0.2 );
+      directionalLight4.position.set( -2.9, 0.9, -2.9 );
+      scene.add( directionalLight4 );
+
+      var texture = THREE.ImageUtils.loadTexture('checker.png');
+      texture.wrapS = THREE.RepeatWrapping;
+      texture.wrapT = THREE.RepeatWrapping;
+      texture.repeat = new THREE.Vector2(50, 50);
+      texture.anisotropy = renderer.getMaxAnisotropy();
+
+      var material = new THREE.MeshPhongMaterial({
+        color: 0xffffff,
+        specular: 0xffffff,
+        shininess: 20,
+        shading: THREE.FlatShading,
+        map: texture
+      });
+
+      var geometry = new THREE.PlaneGeometry(1000, 1000);
+
+      var mesh = new THREE.Mesh(geometry, material);
+      mesh.rotation.x = -Math.PI / 2;
+      scene.add(mesh);
+
+            var rectLength = 10, rectWidth = 5;
+        //////
+      // var rectShape = new THREE.Shape();
+      // rectShape.moveTo( 0,0 );
+      // rectShape.lineTo( 2, rectWidth );
+      // rectShape.lineTo( rectLength, rectWidth );
+      // rectShape.lineTo( rectLength, 2 );
+      // rectShape.lineTo( 20, 5);
+
+      // var rectGeom = new THREE.ShapeGeometry( rectShape );
+      // var texture2 = new THREE.ImageUtils.loadTexture('adye.jpg');
+      // texture2.anisotropy = renderer.getMaxAnisotropy();
+      // var material2 = new THREE.MeshBasicMaterial( { map: texture2 } );
+      // var rectMesh = new THREE.Mesh( rectGeom, material2 );
+
+      // scene.add( rectMesh );
+        ////////
+
+
+         ////////
+      // var geometry2 = new THREE.BoxGeometry( 200, 200, 200 );
+
+      // var texture2 = new THREE.ImageUtils.loadTexture( 'adye.jpg' );
+      // texture2.anisotropy = renderer.getMaxAnisotropy();
+
+      // var material2 = new THREE.MeshBasicMaterial( { map: texture2 } );
+
+      // mesh2 = new THREE.Mesh( geometry2, material2 );
+      // scene.add( mesh2 );
+        /////////
+
+
+    // var darkMaterial = new THREE.MeshBasicMaterial( { color: 0xd02000, transparent:true } ); // red
+    // var multiMaterial = [ darkMaterial, wireframeMaterial ];
+    function layoutBackgroundElements() {
+      var wood = new THREE.MeshLambertMaterial({
+        map: THREE.ImageUtils.loadTexture('wood.jpg'),
+      });
+
+      var bricks = new THREE.MeshLambertMaterial({
+        map: THREE.ImageUtils.loadTexture('bricks.jpg'),
+      });
+
+      var woodFloor = new THREE.MeshLambertMaterial({
+        map: THREE.ImageUtils.loadTexture('woodfloor.jpg'),
+      });
+
+      var space = new THREE.MeshLambertMaterial({
+        map: THREE.ImageUtils.loadTexture('space.jpg'),
+      });
+    }
+
+    layoutBackgroundElements()
+
+    var markopic = new THREE.MeshLambertMaterial({
+      map: THREE.ImageUtils.loadTexture('marko.jpg'),
+    })
+
+    var baopic = new THREE.MeshLambertMaterial({
+      map: THREE.ImageUtils.loadTexture('bao.jpg'),
+    })
+
+    var ganeshpic = new THREE.MeshLambertMaterial({
+      map: THREE.ImageUtils.loadTexture('ganesh.jpg'),
+    })
+
+    var andrewpic = new THREE.MeshLambertMaterial({
+      map: THREE.ImageUtils.loadTexture('andrew.jpg'),
+    })
+
+    var greenMaterial = new THREE.MeshBasicMaterial( { color: 0x00FF00, transparent:true }); //green
+    var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, transparent:true} );
+    var multigreenMaterial = [greenMaterial, wireframeMaterial];
+
+    var marko = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(.1, 20, 20, 1, 1, 1),
+    [markopic] );
+    marko.position.set(-39, 15, -1);
+    scene.add( marko );
+
+    var bao = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(.1, 23, 20, 1, 1, 1),
+    [baopic] );
+    bao.position.set(39, 15, -1);
+    scene.add( bao );
+
+    var ganesh = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(16, 25, .1, 1, 1, 1),
+    [ganeshpic] );
+    ganesh.position.set(-05, 15, -35);
+    scene.add( ganesh );
+
+    var andrew = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(20, 25, .1, 1, 1, 1),
+    [andrewpic] );
+    andrew.position.set(-05, 15, 35);
+    scene.add( andrew );
+
+    var wall1 = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(100, 50, 5, 1, 1, 1),
+    [ bricks ] );
+    wall1.position.set(-10, 5, -40);
+    scene.add( wall1 );
+
+    var wall2 = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(100, 50, 5, 1, 1, 1),
+    [ bricks ] );
+    wall2.position.set(-10,5,40);
+    scene.add(wall2);
+
+    var wall3 = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(100, 50, 100, 1, 1, 1),
+    [ wood ] );
+    wall3.position.set(90,5,0);
+    scene.add(wall3);
+
+    var wall3 = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(100, 50, 100, 1, 1, 1),
+    [ wood ] );
+    wall3.position.set(-90,5,0);
+    scene.add(wall3);
+
+    var ceiling = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(115, 5, 100, 1, 1, 1),
+    [ space ] );
+    ceiling.position.set(-10,35,3);
+    scene.add(ceiling);
+
+    var floor = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(115, 5, 100, 1, 1, 1),
+    [ woodFloor ] );
+    floor.position.set(-10,-2.2,3);
+    scene.add(floor);
+
+
+    // var wall2 = THREE.SceneUtils.createMultiMaterialObject( new THREE.PlaneGeometry(200, 100, 100, 1, 1, 1),
+    // multiMaterial );
+    // wall2.position.set(10, 5, -50);
+    // scene.add( wall1 );
+     // scene.add( wall2 );
+
+
+      window.addEventListener('resize', resize, false);
+      setTimeout(resize, 1);
+    }
+
+    function resize() {
+      var width = container.offsetWidth;
+      var height = container.offsetHeight;
+
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+
+      renderer.setSize(width, height);
+      effect.setSize(width, height);
+    }
+
+    function update(dt) {
+      resize();
+
+      camera.updateProjectionMatrix();
+
+      controls.update(dt);
+    }
+
+    function render(dt) {
+      effect.render(scene, camera);
+    }
+
+    function animate(t) {
+      requestAnimationFrame(animate);
+
+      update(clock.getDelta());
+      render(clock.getDelta());
+
+      // renderer.render(scene, camera);
+    }
+
+    function fullscreen() {
+      if (container.requestFullscreen) {
+        container.requestFullscreen();
+      } else if (container.msRequestFullscreen) {
+        container.msRequestFullscreen();
+      } else if (container.mozRequestFullScreen) {
+        container.mozRequestFullScreen();
+      } else if (container.webkitRequestFullscreen) {
+        container.webkitRequestFullscreen();
+      }
+    }
+  </script>
+  </body>
+</html>

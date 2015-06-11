@@ -1,0 +1,26 @@
+* {
+	/*background-color: black;*/
+	font-family: 'Russo One', sans-serif;
+	color: #8FE83F;
+	text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;
+}
+
+h1 {
+	font-size: 50px;
+}
+
+li {
+	text-decoration: none;
+	list-style: none;
+}
+
+body {
+	
+	display: flex;
+	flex-direction: column;
+	flex-wrap: wrap;
+	align-items: center;
+	background-color: black;
+
+	/*background-image: url("../images/background.png");*/
+}

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Cardboard Example</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+      body {
+        margin: 0px;
+        overflow: hidden;
+      }
+      #example {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="example"></div>
+
+  <script src="three.js"></script>
+  <script src="StereoEffect.js"></script>
+  <script src="DeviceOrientationControls.js"></script>
+  <script src="OrbitControls.js"></script>
+
+  <script>
+    var camera, scene, renderer;
+    var effect, controls;
+    var element, container;
+
+    var clock = new THREE.Clock();
+
+    init();
+    animate();
+
+    function init() {
+      renderer = new THREE.WebGLRenderer();
+      element = renderer.domElement;
+      container = document.getElementById('example');
+      container.appendChild(element);
+
+      effect = new THREE.StereoEffect(renderer);
+
+      scene = new THREE.Scene();
+
+      camera = new THREE.PerspectiveCamera(90, 1, 0.001, 700);
+      camera.position.set( 0, 15, 0);
+      scene.add(camera);
+
+      controls = new THREE.OrbitControls(camera, element);
+      controls.rotateUp(Math.PI / 4);
+      controls.target.set(
+        camera.position.x + 0.1,
+        camera.position.y,
+        camera.position.z
+      );
+      controls.noZoom = true;
+      controls.noPan = true;
+
+      function setOrientationControls(e) {
+        if (!e.alpha) {
+          return;
+        }
+
+        controls = new THREE.DeviceOrientationControls(camera, true);
+        controls.connect();
+        controls.update();
+
+        element.addEventListener('click', fullscreen, false);
+
+        window.removeEventListener('deviceorientation', setOrientationControls, true);
+      }
+      window.addEventListener('deviceorientation', setOrientationControls, true);
+
+
+      var light = new THREE.HemisphereLight(0x777777, 0x000000, 0.3);
+      scene.add(light);
+
+      var ambiLight = new THREE.AmbientLight( 0x404040 ); // soft white light
+      scene.add( ambiLight );
+
+      // var plight = new THREE.PointLight( 0x777777, 2, 100 );
+      // plight.position.set( -20, 5, 0 );
+      // scene.add( plight );     
+
+      var directionalLight1 = new THREE.DirectionalLight( 0xffffff, 0.2 );
+      directionalLight1.position.set( -2.9, 0.9, 2.9 );
+      scene.add( directionalLight1 );
+      var directionalLight2 = new THREE.DirectionalLight( 0xffffff, 0.2 );
+      directionalLight2.position.set( 2.9, 0.9, -2.9 );
+      scene.add( directionalLight2 );
+      var directionalLight3 = new THREE.DirectionalLight( 0xffffff, 0.2 );
+      directionalLight3.position.set( 2.9, 0.9, 2.9 );
+      scene.add( directionalLight3 );
+      var directionalLight4 = new THREE.DirectionalLight( 0xffffff, 0.2 );
+      directionalLight4.position.set( -2.9, 0.9, -2.9 );
+      scene.add( directionalLight4 );
+
+      var texture = THREE.ImageUtils.loadTexture('checker.png');
+      texture.wrapS = THREE.RepeatWrapping;
+      texture.wrapT = THREE.RepeatWrapping;
+      texture.repeat = new THREE.Vector2(50, 50);
+      texture.anisotropy = renderer.getMaxAnisotropy();
+
+      var material = new THREE.MeshPhongMaterial({
+        color: 0xffffff,
+        specular: 0xffffff,
+        shininess: 20,
+        shading: THREE.FlatShading,
+        map: texture
+      });
+
+      var geometry = new THREE.PlaneGeometry(1000, 1000);
+
+      var mesh = new THREE.Mesh(geometry, material);
+      mesh.rotation.x = -Math.PI / 2;
+      scene.add(mesh);
+
+      var rectLength = 10, rectWidth = 5;
+
+
+        //////
+      // var rectShape = new THREE.Shape();
+      // rectShape.moveTo( 0,0 );
+      // rectShape.lineTo( 2, rectWidth );
+      // rectShape.lineTo( rectLength, rectWidth );
+      // rectShape.lineTo( rectLength, 2 );
+      // rectShape.lineTo( 20, 5);
+
+      // var rectGeom = new THREE.ShapeGeometry( rectShape );
+      // var texture2 = new THREE.ImageUtils.loadTexture('adye.jpg');
+      // texture2.anisotropy = renderer.getMaxAnisotropy();
+      // var material2 = new THREE.MeshBasicMaterial( { map: texture2 } );
+      // var rectMesh = new THREE.Mesh( rectGeom, material2 );
+
+      // scene.add( rectMesh );
+        ////////
+
+
+      ////////
+      // var geometry2 = new THREE.BoxGeometry( 200, 200, 200 );
+
+      // var texture2 = new THREE.ImageUtils.loadTexture( 'adye.jpg' );
+      // texture2.anisotropy = renderer.getMaxAnisotropy();
+
+      // var material2 = new THREE.MeshBasicMaterial( { map: texture2 } );
+
+      // mesh2 = new THREE.Mesh( geometry2, material2 );
+      // scene.add( mesh2 );
+      /////////
+
+
+    var darkMaterial = new THREE.MeshBasicMaterial( { color: 0xd02000, transparent:true } ); // red
+    var wireframeMaterial = new THREE.MeshBasicMaterial( { color: 0xffffff, transparent:true} );
+    var multiMaterial = [ darkMaterial, wireframeMaterial ];
+    // var plane = new THREE.PlaneGeometry(1000, 100);
+    // var box = new THREE.BoxGeometry(1000,100,5);
+
+    var customMaterial = {
+
+      wood: new THREE.MeshLambertMaterial({
+        map: THREE.ImageUtils.loadTexture('wood.jpg'),
+      }),
+
+      bricks: new THREE.MeshLambertMaterial({
+        map: THREE.ImageUtils.loadTexture('bricks.jpg'),
+      }),
+
+      woodFloor: new THREE.MeshLambertMaterial({
+        map: THREE.ImageUtils.loadTexture('woodfloor.jpg'),
+      }),
+
+      space: new THREE.MeshLambertMaterial({
+        map: THREE.ImageUtils.loadTexture('space.jpg'),
+      }),
+
+      markopic: new THREE.MeshLambertMaterial({
+        map: THREE.ImageUtils.loadTexture('marko.jpg'),
+      }),
+
+      baopic: new THREE.MeshLambertMaterial({
+        map: THREE.ImageUtils.loadTexture('bao.jpg'),
+      }),
+
+      ganeshpic: new THREE.MeshLambertMaterial({
+        map: THREE.ImageUtils.loadTexture('ganesh.jpg'),
+      }),
+
+      andrewpic: new THREE.MeshLambertMaterial({
+        map: THREE.ImageUtils.loadTexture('andrew.jpg'),
+      }),
+    }
+
+    var greenMaterial = new THREE.MeshBasicMaterial( { color: 0x00FF00, transparent:true }); //green
+    var multigreenMaterial = [greenMaterial, wireframeMaterial];
+
+    var marko = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(.1, 20, 20, 1, 1, 1),
+    [customMaterial.markopic] );
+    marko.position.set(-58, 15, -15);
+    scene.add( marko );
+
+    var bao = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(.1, 23, 20, 1, 1, 1),
+    [customMaterial.baopic] );
+    bao.position.set(38, 15, -1);
+    scene.add( bao );
+
+    var ganesh = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(10, 22, .1, 1, 1, 1),
+    [customMaterial.ganeshpic] );
+    ganesh.position.set(-05, 15, -38.5);
+    scene.add( ganesh );
+
+    var andrew = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(20, 20, .1, 1, 1, 1),
+    [customMaterial.andrewpic] );
+    andrew.position.set(-05, 15, 38.5);
+    scene.add( andrew );
+
+    var ganeshWallYW = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(100, 50, 2, 1, 1, 1),
+    [ customMaterial.bricks ] );
+    ganeshWallYW.position.set(-10, 5, -40);
+    scene.add( ganeshWallYW );
+
+    var andrewWallYE = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(100, 50, 2, 1, 1, 1),
+    [ customMaterial.bricks ] );
+    andrewWallYE.position.set(-10, 5, 40);
+    scene.add( andrewWallYE );
+
+    var baoWallNZ = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(2, 50, 85, 1, 1, 1),
+    [ customMaterial.wood ] );
+    baoWallNZ.position.set(40.5,5,0);
+    scene.add( baoWallNZ );
+
+    var markoWallZS = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(2, 50, 60, 1, 1, 1),
+    [ customMaterial.wood ] );
+    markoWallZS.position.set(-60, 5, -10);
+    scene.add( markoWallZS );
+
+    var room1HallWallXW = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(85, 50, 2, 1, 1, 1),
+    [ customMaterial.bricks ] );
+    room1HallWallXW.position.set(-104, 5, 19);
+    scene.add( room1HallWallXW );
+    
+    var room1HallWallXE = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(65, 50, 2, 1, 1, 1),
+    [ customMaterial.bricks ] );
+    room1HallWallXE.position.set(-92.5, 5, 40);
+    scene.add( room1HallWallXE );
+
+    var room1HallWallZS = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(2, 50, 65, 1, 1, 1),
+    [ customMaterial.bricks ] );
+    room1HallWallZS.position.set(-148, 5, 8);
+    scene.add( room1HallWallZS );
+
+    var room1HallWallZN = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(2, 50, 20, 1, 1, 1),
+    [ customMaterial.wood ] );
+    room1HallWallZN.position.set(-124, 5, 51);
+    scene.add( room1HallWallZN );
+
+    var room2WallZS = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(2, 50, 100, 1, 1, 1),
+    [ customMaterial.wood ] );
+    room2WallZS.position.set(-148, 5, 90.5);
+    scene.add( room2WallZS );
+
+    var room2WallZN = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(2, 50, 100, 1, 1, 1),
+    [ customMaterial.wood ] );
+    room2WallZN.position.set(-40, 5, 90);
+    scene.add( room2WallZN );
+
+    var room2WallXW = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(110, 50, 2, 1, 1, 1),
+    [ customMaterial.wood ] );
+    room2WallXW.position.set(-95, 5, 141);
+    scene.add( room2WallXW );
+    
+    var room2WallXE = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(82, 50, 2, 1, 1, 1),
+    [ customMaterial.wood ] );
+    room2WallXE.position.set(-82, 5, 60);
+    scene.add( room2WallXE );
+
+    // var ceiling = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(115, 5, 100, 1, 1, 1),
+    // [ customMaterial.space ] );
+    // ceiling.position.set(-10,35,3);
+    // scene.add(ceiling);
+
+    var floor = THREE.SceneUtils.createMultiMaterialObject( new THREE.BoxGeometry(250, 5, 250, 1, 1, 1),
+    [ customMaterial.woodFloor ] );
+    floor.position.set(-85,0,80);
+    scene.add(floor);
+   
+
+    // var wall2 = THREE.SceneUtils.createMultiMaterialObject( new THREE.PlaneGeometry(200, 100, 100, 1, 1, 1),
+    // multiMaterial );
+    // wall2.position.set(10, 5, -50);
+    // scene.add( wall1 );
+     // scene.add( wall2 );
+
+
+    // Adding the car object
+
+    loader = new THREE.JSONLoader();
+    var meshCar;
+    loader.load('car.js', function (geometry, materials) {
+      // debugger
+      var material = new THREE.MeshLambertMaterial({
+        map: THREE.ImageUtils.loadTexture('gtare.jpg'),   
+        colorAmbient: [0.480000026226044, 0.480000026226044, 0.480000026226044],
+        colorDiffuse: [0.480000026226044, 0.480000026226044, 0.480000026226044],
+        colorSpecular: [0.8999999761581421, 0.8999999761581421, 0.8999999761581421]
+      });
+
+      // debugger
+      
+      meshCar = new THREE.Mesh(
+        geometry,
+        material
+      );
+
+      meshCar.scale.x = 0.2;
+      meshCar.scale.y = 0.2;
+      meshCar.scale.z = 0.2;
+
+      meshCar.position.set(-100,2,100)
+
+      meshCar.receiveShadow = true;
+      meshCar.castShadow = true;
+      meshCar.rotation.y = -Math.PI/5;
+
+      scene.add(meshCar);
+      render(); 
+      // debugger;
+    });
+
+
+
+      window.addEventListener('resize', resize, false);
+      setTimeout(resize, 1);
+    }
+
+    function resize() {
+      var width = container.offsetWidth;
+      var height = container.offsetHeight;
+
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+
+      renderer.setSize(width, height);
+      effect.setSize(width, height);
+    }
+
+    function update(dt) {
+      resize();
+
+      camera.updateProjectionMatrix();
+
+      controls.update(dt);
+    }
+
+    function render(dt) {
+      effect.render(scene, camera);
+
+    }
+
+    function animate(t) {
+      requestAnimationFrame(animate);
+
+      update(clock.getDelta());
+      render(clock.getDelta());
+
+      var timer = clock.getElapsedTime();
+      var startTimer = 5;
+
+      if ((timer > (startTimer + 1)) && (timer < (startTimer +  7))) {
+        camera.position.x -= 0.1;
+        camera.position.z += 0.1;
+      };
+      
+      if ((timer > (startTimer + 7)) && (timer < (startTimer + 25))) {
+        camera.position.x -= 0.1;
+        // camera.position.z += 0.1;
+      };
+
+      if ((timer > (startTimer + 25)) && (timer < (startTimer + 32))) {
+        // camera.position.x -= 0.1;
+        camera.position.z += 0.1;
+      };
+
+
+      // renderer.render(scene, camera);
+    }
+
+    function fullscreen() {
+      if (container.requestFullscreen) {
+        container.requestFullscreen();
+      } else if (container.msRequestFullscreen) {
+        container.msRequestFullscreen();
+      } else if (container.mozRequestFullScreen) {
+        container.mozRequestFullScreen();
+      } else if (container.webkitRequestFullscreen) {
+        container.webkitRequestFullscreen();
+      }
+    }
+  </script>
+  </body>
+</html>
